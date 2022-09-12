@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .message{
+            height: 300px;
+            border: 1px solid #dddddd;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="message" id="message"></div>
+<div>
+    <input type="text" placeholder="请输入" id="txt">
+    <input type="button" value="发送" onclick="sendMessage()">
+    <input type="button" value="关闭连接" onclick="closeConn()">
+</div>
+
+<script>
+    socket = new WebSocket("ws://127.0.0.1:8000/room/{{ qq_group_num }}/");
+    {#当ws收到服务端的消息时，自动触发#}
+    {#刚创建好连接后触发#}
+    socket.onopen = function (event) {
+        let tag = document.createElement("div");
+        tag.innerText = "连接成功";
+        document.getElementById("message").appendChild(tag);
+    }
+
+    socket.onmessage = function (event) {
+        let tag = document.createElement("div");
+        tag.innerText = event.data;
+        document.getElementById("message").appendChild(tag);
+    }
+
+    function sendMessage(){
+        let tag = document.getElementById("txt");
+        socket.send(tag.value);
+    }
+
+    function closeConn(){
+        socket.close();
+    }
+    {#服务端主动断开时触发#}
+    socket.onclose = function (event) {
+        let tag = document.createElement("div");
+        tag.innerText = "服务端断开";
+        document.getElementById("message").appendChild(tag);
+    }
+
+</script>
+</body>
+</html>
